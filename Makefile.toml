@@ -1,0 +1,38 @@
+[config]
+default_to_workspace = false
+skip_core_tasks = true
+
+[tasks.build_program]
+script = """
+anchor build
+"""
+
+[tasks.deploy_program]
+script = """
+cp .keys/stader_liquid_staking-keypair.json target/deploy/stader_liquid_staking-keypair.json
+anchor deploy
+"""
+dependencies = ["build_program"]
+
+[tasks.copy_files]
+script = """
+cp target/idl/stader_liquid_staking.json simulation/targets/idl/stader_liquid_staking.json
+cp target/types/stader_liquid_staking.ts simulation/targets/types/stader_liquid_staking.ts
+"""
+
+[tasks.prerequisites]
+script = """
+solana-keygen new --outfile .keys/stader-buffer.json --no-passphrase
+solana-keygen new --outfile stader-liquid-staking-program.json --no-passphrase
+solana-keygen new --outfile .keys/admin.json --no-passphrase
+solana-keygen new --outfile .keys/cranker.json --no-passphrase --force
+solana-keygen new --outfile .keys/lpMint.json --no-passphrase --force
+solana-keygen new --outfile .keys/operationalSolAccount.json --no-passphrase --force
+solana-keygen new --outfile .keys/staderSolMint.json --no-passphrase --force
+solana-keygen new --outfile .keys/stakeList.json --no-passphrase --force
+solana-keygen new --outfile .keys/stateAccount.json --no-passphrase --force
+solana-keygen new --outfile .keys/validatorsList.json --no-passphrase --force
+"""
+
+[tasks.do_all]
+dependencies = ["deploy_program", "copy_files"]
